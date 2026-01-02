@@ -1,0 +1,519 @@
+{
+	"info": {
+		"_postman_id": "14ed4bd8-6800-4d29-a415-d3b89cf3fe7d",
+		"name": "DummyJSON Env",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50756874",
+		"_collection_link": "https://felipetster-9630057.postman.co/workspace/DummyJSON-Env~7d4f0644-9309-4e80-8a7d-694eeeccce18/collection/50756874-14ed4bd8-6800-4d29-a415-d3b89cf3fe7d?action=share&source=collection_link&creator=50756874"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const {accessToken, id, firstName, gender } = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Login realizado com sucesso (200)\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Token JWT foi gerado e é válido\", () => {\r",
+									"\r",
+									"    pm.expect(accessToken).to.be.a('string').and.to.not.be.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Dados do usuário conferem\", () => {\r",
+									"    pm.expect(id).to.be.a('number');\r",
+									"});\r",
+									"\r",
+									"if (accessToken) {\r",
+									"    pm.environment.set(\"auth_token\", accessToken);\r",
+									"    console.log(`Token salvo com sucesso!`);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"emilys\",\r\n    \"password\": \"emilyspass\",\r\n    \"expiresInMins\": 30\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Products Module",
+			"item": [
+				{
+					"name": "Listar produtos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status é igual a 200\", () => {\r",
+									"pm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"Valida produto específico\", () => {\r",
+									"    const produtoAlvo = jsonData.products.find(p => p.title === \"Essence Mascara Lash Princess\");\r",
+									"\r",
+									"    pm.expect(produtoAlvo, \"Erro: Nome do produto não encontrado ou escrito errado!\").to.not.be.undefined;\r",
+									"\r",
+									"    if (produtoAlvo) {\r",
+									"        pm.expect(produtoAlvo.price).to.be.below(15);\r",
+									"        pm.expect(produtoAlvo.category).to.eql(\"beauty\");\r",
+									"        pm.environment.set(\"id_produto\", produtoAlvo.id);\r",
+									"        console.log(\"Produto encontrado ID: \" + produtoAlvo.id);\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Tempo de resposta aceitável (<500ms)\", () => {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar produto por ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();\r",
+									"\r",
+									"const id_esperado = parseInt(pm.environment.get(\"id_produto\"));\r",
+									"\r",
+									"pm.test(\"Status 200 -> Produto encontrado\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"O ID retornado é igual ao esperado\", () => {\r",
+									"    pm.expect(jsonData.id).to.eql(id_esperado);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Campos obrigatórios existem\", () => {\r",
+									"    pm.expect(jsonData).to.have.property('title');\r",
+									"    pm.expect(jsonData).to.have.property('description');\r",
+									"    pm.expect(jsonData).to.have.property('price');\r",
+									"});\r",
+									"\r",
+									"console.log(`Detalhes validados para: ${jsonData.title} | Preço: $${jsonData.price}`);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products/{{id_produto}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"{{id_produto}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Adicionar produto",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const precoAleatorio = Math.floor(Math.random()*1000) + 1;\r",
+									"const nomeUnico = `Produto QA ${Date.now()}`;\r",
+									"\r",
+									"pm.environment.set(\"novo_nome\", nomeUnico);\r",
+									"pm.environment.set(\"novo_preco\", precoAleatorio);\r",
+									"\r",
+									"console.log(`Preparando para criar: ${nomeUnico} | Preço : ${precoAleatorio} `);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();\r",
+									"\r",
+									"const nomeEnviado = pm.environment.get(\"novo_nome\");\r",
+									"const precoEnviado = parseInt(pm.environment.get(\"novo_preco\"));\r",
+									"\r",
+									"pm.test(\"Produto criado com sucesso (200/201)\", () => {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Novo ID foi gerado\", () => {\r",
+									"    pm.expect(jsonData.id).to.not.be.undefined;\r",
+									"    pm.expect(jsonData.id).to.be.a('number');\r",
+									"    console.log(`Produto criado com sucesso! ID gerado: ${jsonData.id}`)\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Dados salvos conferem com o enviado\", () => {\r",
+									"    pm.expect(jsonData.title).to.be.eql(nomeEnviado);\r",
+									"    pm.expect(jsonData.price).to.be.eql(precoEnviado);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"{{novo_nome}}\",\r\n    \"price\": {{novo_preco}},\r\n    \"category\": \"electronics\",\r\n    \"description\": \"Um produto de teste criado via Postman Automation\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/products/add",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"add"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Carts & Checkout",
+			"item": [
+				{
+					"name": "Ver carrinho",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code é igual a 200\", () => {\r",
+									"    pm.expect(pm.response).to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/carts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Adicionar item carrinho",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status 200/201\", () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));\r",
+									"\r",
+									"pm.test(\"Retornou a lista de produtos\", () => {\r",
+									"    pm.expect(jsonData.products).to.not.be.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"O cálculo do carrinho está correto\", () => {\r",
+									"    const somaCalculada = jsonData.products.reduce((acc, item) => acc + item.total, 0);\r",
+									"\r",
+									"    console.log(`Auditoria: Soma front (${somaCalculada}) vs Soma back (${jsonData.total})`);\r",
+									"\r",
+									"    pm.expect(jsonData.total).to.eql(somaCalculada);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Quantidade de itens bate com o solicitado\", () => {\r",
+									"    const produto1 = jsonData.products.find(p => p.id === 1);\r",
+									"    pm.expect(produto1.quantity).to.eql(2);\r",
+									"\r",
+									"    const contaCorreta = produto1.price * produto1.quantity;\r",
+									"    pm.expect(produto1.total).to.eql(contaCorreta);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"packages": {},
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\": 5,\r\n    \"products\": [\r\n        {\r\n            \"id\": 1,\r\n            \"quantity\": 2\r\n        },\r\n        {\r\n            \"id\": 10,\r\n            \"quantity\": 1\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/carts/add",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"carts",
+								"add"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User management",
+			"item": [
+				{
+					"name": "Criar usuário",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Usuário criado (200/201)\", () => {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+									"});\r",
+									"\r",
+									"if (jsonData.id) {\r",
+									"    pm.environment.set(\"user_id\", jsonData.id);\r",
+									"    console.log(`Usuário criado com sucesso! ID: ${jsonData.id}`)\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"{{$randomFirstName}}\",\r\n    \"lastName\": \"{{$randomLastName}}\",\r\n    \"age\": {{$randomInt}},\r\n    \"email\": \"{{$randomEmail}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users/add",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Editar usuário",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status 200 (atualizado)\", () => pm.response.to.have.status(200));\r",
+									"\r",
+									"pm.test(\"Sobrenome foi atualizado\", () => {\r",
+									"    pm.expect(jsonData.lastName).to.be.eql(\"QA Senior\")\r",
+									"});\r",
+									"\r",
+									"pm.test(\"ID permanece inalterado\", () => {\r",
+									"    pm.expect(jsonData.id).to.be.eql(1);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"lastName\": \"QA Senior\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deletar usuário",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status 200 (Deletado)\", () => pm.response.to.have.status(200));\r",
+									"\r",
+									"pm.test(\"Flag Deletado é verdadeira\", () => {\r",
+									"    pm.expect(jsonData.isDeleted).to.be.true;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Possui data de deleção\", () => {\r",
+									"    pm.expect(jsonData.deletionDate).to.not.be.null;\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
