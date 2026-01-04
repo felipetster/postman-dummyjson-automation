@@ -1,7 +1,8 @@
 # DummyJSON API Automation
 
-Projeto de automação de testes de API utilizando **Postman** e **JavaScript (ES6+)**.
-O objetivo é validar o fluxo completo de um e-commerce (Auth, Produtos, Carrinho e Usuários) garantindo integridade de dados e regras de negócio financeira
+Projeto de automação de testes de API utilizando Postman e JavaScript (ES6+), com foco na validação de fluxos completos de e-commerce e na integridade de regras de negócio, especialmente financeiras.
+
+O objetivo deste projeto é simular cenários reais de QA, indo além da validação de status HTTP, verificando se o backend se comporta corretamente em cálculos, contratos e regras críticas do negócio.
 
 ## Tecnologias Utilizadas
 * **Postman** (Client & Runner)
