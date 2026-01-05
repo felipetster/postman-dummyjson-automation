@@ -12,8 +12,9 @@ O objetivo deste projeto é simular cenários reais de QA, indo além da valida�
 ## Cenários Cobertos
 
 ### 01. Authentication
-* Login com validação de **JWT Token**.
-* Uso de variáveis de ambiente para persistência de sessão.
+* Login com validação de JWT Token
+* Persistência de sessão utilizando variáveis de ambiente
+* Validação de respostas e estrutura do payload
 
 ### 02. Products Management
 * Busca de produtos utilizando métodos de Array (`.find`).
