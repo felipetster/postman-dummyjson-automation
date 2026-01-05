@@ -22,8 +22,13 @@ O objetivo deste projeto é simular cenários reais de QA, indo além da valida�
 * Cadastro de produtos com dados dinâmicos (Pre-request Script).
 
 ### 03. Carts & Checkout (Destaque)
-* **Auditoria Financeira:** Uso do método `.reduce()` para recalcular a soma total do carrinho e validar se o Backend está somando corretamente.
-* Validação de multiplicação (Preço Unitário x Quantidade) item a item.
+* Auditoria Financeira do Carrinho
+* Recalculo do total do carrinho utilizando reduce()
+* Validação se o backend soma corretamente os valores
+* Verificação item a item:
+* Preço unitário x quantidade
+* Consistência entre subtotal e total
+* Identificação de possíveis falhas de cálculo no servidor.
 
 ### 04. User Management (CRUD)
 * Criação de usuários com **Faker Data** (Variáveis dinâmicas).
